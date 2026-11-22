@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -13,21 +12,36 @@ import (
 
 	"github.com/vinayraj010/GoRESTApi/internal/config"
 	"github.com/vinayraj010/GoRESTApi/internal/http/handlers/student"
+	"github.com/vinayraj010/GoRESTApi/internal/storage/sqlite"
 )
 
 func main() {
 	cfg := config.MustLoad()
 
-	router := http.NewServeMux()
-	router.HandleFunc("POST /api/students", student.New())
+	// database setup
+	storage, err := sqlite.New(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	slog.Info("storage initialized", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
+
+	// setup router
+	router := http.NewServeMux()
+
+	router.HandleFunc("POST /api/students", student.New(storage))
+	router.HandleFunc("GET /api/students/{id}", student.GetById(storage))
+	router.HandleFunc("GET /api/students", student.GetList(storage))
+	router.HandleFunc("PUT /api/students/{id}", student.Update(storage))
+	router.HandleFunc("DELETE /api/students/{id}", student.Delete(storage))
+
+	// setup server
 	server := http.Server{
 		Addr:    cfg.HTTPServer.Addr,
 		Handler: router,
 	}
 
 	slog.Info("server started", slog.String("address", cfg.HTTPServer.Addr))
-	fmt.Printf("server started %s\n", cfg.HTTPServer.Addr)
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)

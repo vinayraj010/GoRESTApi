@@ -12,15 +12,14 @@ import (
 	"time"
 
 	"github.com/vinayraj010/GoRESTApi/internal/config"
+	"github.com/vinayraj010/GoRESTApi/internal/http/handlers/student"
 )
 
 func main() {
 	cfg := config.MustLoad()
 
 	router := http.NewServeMux()
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome to students api"))
-	})
+	router.HandleFunc("POST /api/students", student.New())
 
 	server := http.Server{
 		Addr:    cfg.HTTPServer.Addr,

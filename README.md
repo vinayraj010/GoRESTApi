@@ -1,4 +1,4 @@
-Here is the updated `README.md` without icons, without the License section, and with detailed explanations of the code, methods, and the exact flow of how the application works, including the code for all the files.
+Here is the updated `README.md` with the `curl` commands and their explanations added to the API Endpoints section.
 
 ```markdown
 # GoRESTApi - Student Management API
@@ -7,7 +7,6 @@ A simple and robust RESTful API built with Go (Golang) to manage student records
 
 ## Project Structure
 
-```text
 GoRESTApi/
 ├── cmd/
 │   └── student-api/
@@ -577,37 +576,116 @@ func main() {
 | PUT | `/api/students/{id}` | Update an existing student's details |
 | DELETE | `/api/students/{id}` | Delete a student by ID |
 
-### Request/Response Examples
+### Curl Commands and Explanations
 
-1. Create a Student (POST `/api/students`)
-Request Body:
-```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "age": 20
-}
-```
-Response (201 Created):
-```json
-{
-  "id": 1
-}
+Here are the examples of how to interact with the API using `curl`.
+
+**1. Get a list of all students (GET `/api/students`)**
+
+```bash
+curl --location 'http://localhost:8082/api/students'
 ```
 
-2. Get All Students (GET `/api/students`)
-Response (200 OK):
+*Explanation:* This command sends a GET request to fetch all student records. The server responds with an array of JSON objects, each representing a student.
+
+*Expected Output:*
 ```json
 [
-  {
-    "id": 1,
-    "name": "John Doe",
-    "email": "john@example.com",
-    "age": 20
-  }
+    {
+        "id": 3,
+        "name": "VinaySharma",
+        "email": "sdfasdf@gmail.com",
+        "age": 34
+    },
+    {
+        "id": 4,
+        "name": "VinaySharma",
+        "email": "sdfasdf@gmail.com",
+        "age": 34
+    },
+    {
+        "id": 5,
+        "name": "VinaySharma",
+        "email": "sdfasdf@gmail.com",
+        "age": 34
+    }
 ]
+```
+
+**2. Create a new student (POST `/api/students`)**
+
+```bash
+curl --location 'http://localhost:8082/api/students' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "VinaySharma",
+    "email": "sdfasdf@gmail.com",
+    "age": 34
+  }'
+```
+
+*Explanation:* This command sends a POST request with a JSON body containing the new student's details. The `--header` flag sets the content type to JSON. The server validates the data and inserts it into the database, returning the newly generated ID.
+
+*Expected Output:*
+```json
+{
+    "id": 5
+}
+```
+
+**3. Get a specific student by ID (GET `/api/students/{id}`)**
+
+```bash
+curl --location 'http://localhost:8082/api/students/1'
+```
+
+*Explanation:* This command sends a GET request to a specific ID (in this case, 1). The server queries the database for that ID and returns the corresponding student's details.
+
+*Expected Output:*
+```json
+{
+    "id": 1,
+    "name": "Updated Name",
+    "email": "updated@gmail.com",
+    "age": 32
+}
+```
+
+**4. Update a student's details (PUT `/api/students/{id}`)**
+
+```bash
+curl --location --request PUT 'http://localhost:8082/api/students/1' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "Updated Name",
+    "email": "updated@gmail.com",
+    "age": 32
+  }'
+```
+
+*Explanation:* This command uses the PUT method (specified by `--request PUT`) to update an existing student's record. It includes the ID in the URL and the new data in the JSON body.
+
+*Expected Output:*
+```json
+{
+    "message": "student updated successfully"
+}
+```
+
+**5. Delete a student (DELETE `/api/students/{id}`)**
+
+```bash
+curl --location --request DELETE 'http://localhost:8082/api/students/2'
+```
+
+*Explanation:* This command uses the DELETE method to remove a student from the database by their ID. If successful, it returns a success message.
+
+*Expected Output:*
+```json
+{
+    "message": "student deleted successfully"
+}
 ```
 
 ## Stopping the Server
 To stop the server gracefully, press `Ctrl + C` in the terminal where it is running. The server will catch the interrupt signal, close the database connection, and shut down cleanly.
-```
